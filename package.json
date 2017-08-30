@@ -1,0 +1,22 @@
+{
+  "name": "kanttiinit",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "kanttiinit": "index.js",
+    "knt": "index.js"
+  },
+  "dependencies": {
+    "chalk": "^2.1.0",
+    "commander": "^2.11.0",
+    "moment": "^2.18.1",
+    "node-fetch": "^1.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "bodyflex <max.huttunen@gmail.com>",
+  "license": "ISC"
+}
