@@ -3,6 +3,8 @@
 ## Install
 `npm i -g kanttiinit`
 
+Note! Requires at least Node 7.6.
+
 ## Usage
 ```
 $ kanttiinit --help
