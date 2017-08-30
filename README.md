@@ -28,5 +28,8 @@ $ kanttiinit --help
 ```
 
 ## Examples
-* `kanttiinit otaniemi`
-* `kanttiinit geo otakaari 1`
+* Get all restaurants in an area: `kanttiinit otaniemi`
+* Get all restaurants whose title matches the query: `kanttiinit aalto`
+* Get nearest restaurants to an address: `kanttiinit geo otakaari 1`
+* Hide closed restaurants: `kanttiinit -h keskusta`
+* Show tomorrows menus: `kanttiinit -d 1 töölö`

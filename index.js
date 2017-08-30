@@ -37,11 +37,12 @@ const isOpen = hours => {
   if (!hours) {
     return false;
   }
-  let [open, close] = hours.split(' - ');
-  open = Number(open.replace(':', ''));
-  close = Number(close.replace(':', ''));
-  const now = moment().format('HHmm');
-  return now >= open && now < close;
+  const [opens, closes] = hours.split(' - ');
+  const now = moment();
+  if (now.isAfter(moment(opens, 'HH:mm')) && now.isBefore(moment(closes, 'HH:mm'))) {
+    return moment(closes, 'HH:mm').fromNow();
+  }
+  return false;
 };
 
 const getLocation = async address => {
@@ -58,7 +59,9 @@ const getLocation = async address => {
 
 const showMenus = async (restaurantsQuery, options) => {
   const lang = settings.read().lang || 'fi';
-  const day = options.day || moment();
+  const now = moment();
+  const day = options.day || now;
+  const isToday = now.isSame(day, 'day');
 
   log('Fetching restaurants...');
   const restaurants = await get(`restaurants?${restaurantsQuery}&lang=${lang}`);
@@ -75,10 +78,15 @@ const showMenus = async (restaurantsQuery, options) => {
     }
     output += `${chalk.bold(restaurant.name)} `;
     if (openingHours) {
-     output += `${opened ? chalk.green(openingHours) : chalk.dim(openingHours)}\n`;
+     output += `${opened ? chalk.green(openingHours) : chalk.dim(openingHours)}`;
+     if (opened && isToday) {
+       output += chalk.dim(` closes ${opened}`);
+     }
     } else {
-      output += `closed\n`;
+      output += `closed`;
     }
+    output += '\n';
+
     if (restaurant.distance) {
       output += chalk.dim(`${restaurant.distance} meters away\n`);
     }
