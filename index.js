@@ -1,5 +1,6 @@
 #! /usr/bin/env node
-
+const fs = require('fs');
+const os = require('os');
 const readline = require('readline');
 const chalk = require('chalk');
 const fetch = require('node-fetch');
@@ -10,6 +11,20 @@ const pkg = require('./package.json')
 const get = async resource => {
   const response = await fetch(`https://kitchen.kanttiinit.fi/${resource}`);
   return response.json();
+};
+
+const settings = {
+  path: `${os.homedir()}/.kanttiinit`,
+  write(data) {
+    fs.writeFileSync(settings.path, JSON.stringify(data));
+  },
+  read() {
+    try {
+      return JSON.parse(fs.readFileSync(settings.path));
+    } catch (e) {
+      return {};
+    }
+  }
 };
 
 const log = message => {
@@ -42,7 +57,7 @@ const getLocation = async address => {
 };
 
 const showMenus = async (restaurantsQuery, options) => {
-  const lang = options.lang || 'fi';
+  const lang = settings.read().lang || 'fi';
   const day = options.day || moment();
 
   log('Fetching restaurants...');
@@ -99,21 +114,32 @@ const showMenus = async (restaurantsQuery, options) => {
   })
   .option('-a, --address', 'show restaurant address')
   .option('-u, --url', 'show restaurant URL')
-  .option('-h, --hide-closed', 'hide closed restaurants')
-  .option('--set-lang', 'set the language (will be persisted)')
-
-  program
-  .command('geo [address]')
-  .description('Query restaurants by your address.')
-  .action(async (address, options) => {
-    log('Resolving location...');
-    const {latitude, longitude} = await getLocation(address);
-    showMenus(`location=${latitude},${longitude}`, options.parent);
-  })
+  .option('-h, --hide-closed', 'hide closed restaurants');
 
   program
   .command('*')
   .description('Search restaurants by restaurant or area name.')
   .action((query, options) => showMenus(`query=${query}`, options.parent));
+
+  program
+  .command('geo <address>')
+  .description('Query restaurants by your address.')
+  .action(async (address, options) => {
+    log('Resolving location...');
+    const {latitude, longitude} = await getLocation(address);
+    showMenus(`location=${latitude},${longitude}`, options.parent);
+  });
+
+  program
+  .command('set-lang <language>')
+  .description('set and persist the preferred language (accepted values are fi and en)')
+  .action(lang => {
+    if (lang === 'fi' || lang === 'en') {
+      settings.write({lang});
+      log('Your choice has been saved.\n');
+    } else {
+      log('Only "fi" and "en" are supported.\n');
+    }
+  });
 
   program.parse(process.argv);
