@@ -98,7 +98,11 @@ const showMenus = async (restaurantsQuery, options) => {
     }
     const courses = (menus[restaurant.id] || {})[day.format('YYYY-MM-DD')];
     if (courses) {
-      for (const course of courses) {
+      const query = new RegExp(options.filter, 'i');
+      const filteredCourses = options.filter
+        ? courses.filter(course => course.title.match(query))
+        : courses;
+      for (const course of filteredCourses) {
         output += `◦ ${course.title} ${chalk.dim(course.properties.join(', '))}\n`;
       }
     } else {
@@ -122,7 +126,8 @@ const showMenus = async (restaurantsQuery, options) => {
   })
   .option('-a, --address', 'show restaurant address')
   .option('-u, --url', 'show restaurant URL')
-  .option('-h, --hide-closed', 'hide closed restaurants');
+  .option('-h, --hide-closed', 'hide closed restaurants')
+  .option('-f, --filter <keyword>', 'filter courses by keyword');
 
   program
   .command('*')

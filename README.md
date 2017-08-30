@@ -33,3 +33,4 @@ $ kanttiinit --help
 * Get nearest restaurants to an address: `kanttiinit geo otakaari 1`
 * Hide closed restaurants: `kanttiinit -h keskusta`
 * Show tomorrows menus: `kanttiinit -d 1 töölö`
+* Only show courses which contain the word pizza: `kanttiinit -f pizza arabia`
