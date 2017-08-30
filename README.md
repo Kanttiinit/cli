@@ -12,19 +12,20 @@ $ kanttiinit --help
 
   Options:
 
-    -V, --version      output the version number
-    -d, --day <day>    specify day
-    -a, --address      show restaurant address
-    -u, --url          show restaurant URL
-    -h, --hide-closed  hide closed restaurants
-    --set-lang         set the language (will be persisted)
-    -h, --help         output usage information
+    -V, --version           output the version number
+    -d, --day <day>         specify day
+    -a, --address           show restaurant address
+    -u, --url               show restaurant URL
+    -h, --hide-closed       hide closed restaurants
+    -f, --filter <keyword>  filter courses by keyword
+    -h, --help              output usage information
 
 
   Commands:
 
-    geo [address]  Query restaurants by your address.
-    *              Search restaurants by restaurant or area name.
+    *                    Search restaurants by restaurant or area name.
+    geo <address>        Query restaurants by your address.
+    set-lang <language>  set and persist the preferred language (accepted values are fi and en)
 ```
 
 ## Examples
