@@ -10,13 +10,22 @@ const pkg = require('./package.json')
 
 const get = async resource => {
   const response = await fetch(`https://kitchen.kanttiinit.fi/${resource}`);
+  if (!response.ok) {
+    log(`Failed to fetch data (${resource}).`);
+    process.exit(1);
+  }
   return response.json();
 };
 
 const settings = {
   path: `${os.homedir()}/.kanttiinit`,
   write(data) {
-    fs.writeFileSync(settings.path, JSON.stringify(data));
+    try {
+      fs.writeFileSync(settings.path, JSON.stringify(data));
+    } catch (e) {
+      log('Failed to write settings.');
+      process.exit(1);
+    }
   },
   read() {
     try {
@@ -152,7 +161,7 @@ const showMenus = async (restaurantsQuery, options) => {
 
   program
   .command('set-lang <language>')
-  .description('set and persist the preferred language (accepted values are fi and en)')
+  .description('Set and persist the preferred language (accepted values are fi and en).')
   .action(lang => {
     if (lang === 'fi' || lang === 'en') {
       settings.write({lang});
