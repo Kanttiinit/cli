@@ -64,15 +64,19 @@ const showMenus = async (restaurantsQuery, options) => {
   const isToday = now.isSame(day, 'day');
 
   log('Fetching restaurants...');
-  const restaurants = await get(`restaurants?${restaurantsQuery}&lang=${lang}`);
-  const filteredRestaurants = restaurants.slice(0, options.number);
-  log(`Got ${filteredRestaurants.length} restaurants...`);
+  let restaurants = await get(`restaurants?${restaurantsQuery}&lang=${lang}`);
+  if (options.number) {
+    restaurants = restaurants.slice(0, options.number);
+  }
+  if (!restaurantsQuery.match('location')) {
+    restaurants = restaurants.sort((a, b) => a.name > b.name ? 1 : -1);
+  }
   log('Fetching menus...');
   const restaurantIds = restaurants.map(r => r.id);
   const menus = await get(`menus?restaurants=${restaurantIds.join(',')}&days=${day.format('YYYY-MM-DD')}&lang=${lang}`);
   
   let output = `\n${day.format('dddd Do [of] MMMM YYYY')}\n\n`;
-  for (const restaurant of filteredRestaurants) {
+  for (const restaurant of restaurants) {
     const openingHours = restaurant.openingHours[day.format('E') - 1];
     const opened = isOpen(openingHours);
     if ((!openingHours || !opened) && options.hideClosed) {
