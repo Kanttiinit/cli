@@ -20,6 +20,7 @@ $ kanttiinit --help
     -u, --url               show restaurant URL
     -h, --hide-closed       hide closed restaurants
     -f, --filter <keyword>  filter courses by keyword
+    -n, --number <number>   show only n restaurants
     -h, --help              output usage information
 
 
@@ -27,7 +28,7 @@ $ kanttiinit --help
 
     *                    Search restaurants by restaurant or area name.
     geo <address>        Query restaurants by your address.
-    set-lang <language>  set and persist the preferred language (accepted values are fi and en)
+    set-lang <language>  Set and persist the preferred language (accepted values are fi and en).
 ```
 
 ## Examples
