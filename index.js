@@ -65,12 +65,14 @@ const showMenus = async (restaurantsQuery, options) => {
 
   log('Fetching restaurants...');
   const restaurants = await get(`restaurants?${restaurantsQuery}&lang=${lang}`);
+  const filteredRestaurants = restaurants.slice(0, options.number);
+  log(`Got ${filteredRestaurants.length} restaurants...`);
   log('Fetching menus...');
   const restaurantIds = restaurants.map(r => r.id);
   const menus = await get(`menus?restaurants=${restaurantIds.join(',')}&days=${day.format('YYYY-MM-DD')}&lang=${lang}`);
   
   let output = `\n${day.format('dddd Do [of] MMMM YYYY')}\n\n`;
-  for (const restaurant of restaurants) {
+  for (const restaurant of filteredRestaurants) {
     const openingHours = restaurant.openingHours[day.format('E') - 1];
     const opened = isOpen(openingHours);
     if ((!openingHours || !opened) && options.hideClosed) {
@@ -127,7 +129,8 @@ const showMenus = async (restaurantsQuery, options) => {
   .option('-a, --address', 'show restaurant address')
   .option('-u, --url', 'show restaurant URL')
   .option('-h, --hide-closed', 'hide closed restaurants')
-  .option('-f, --filter <keyword>', 'filter courses by keyword');
+  .option('-f, --filter <keyword>', 'filter courses by keyword')
+  .option('-n, --number <number>', 'show only n restaurants');
 
   program
   .command('*')
