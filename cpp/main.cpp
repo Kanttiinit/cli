@@ -22,11 +22,10 @@ void show_menus(string query, cxxopts::ParseResult args) {
   int n_restaurants = args.count("number") ? args["number"].as<int>() : -1;
 
   // form string of restaurant IDs and fetch menus for them
-  string restaurant_ids = "";
-  for (auto& restaurant : restaurants) {
+  string restaurant_ids = accumulate(restaurants.begin(), restaurants.end(), string(""), [](string list, json::value_type restaurant) {
     int id = restaurant["id"];
-    restaurant_ids += to_string(id) + ",";
-  }
+    return list + to_string(id) + ",";
+  });
   auto menus = get("menus?restaurants=" + restaurant_ids + "&days=" + day + "&lang=" + lang);
   
   // sort restaurants if restaurants are queried by location
@@ -96,8 +95,15 @@ void show_menus(string query, cxxopts::ParseResult args) {
       }
       
       json properties = course["properties"];
-      string prop_string = join_json_array(properties, ", ");
-      cout << "◦ " << title << " " << termcolor::dark << prop_string << termcolor::reset << "\n";
+      string prop_string = "";
+      if (properties.size()) {
+        string last_prop = *(properties.end() - 1);
+        prop_string = accumulate(properties.begin(), properties.end(), string(""), [last_prop](string list, string p) {
+          return list + p + (p == last_prop ? "" : ", ");
+        });
+      }
+      Print::basic("◦ " + title + " ");
+      Print::dimmed(prop_string + "\n");
     }
     if (courses.begin() == courses.end()) {
       Print::basic("No menu.\n");

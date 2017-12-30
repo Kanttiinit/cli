@@ -31,18 +31,6 @@ json get(string endpoint) {
   return json::parse(raw_json);
 }
 
-string join_json_array(json json_array, string delimit) {
-  string output = "";
-  for (json::iterator it = json_array.begin(); it != json_array.end(); ++it) {
-    string value = *it;
-    output += value;
-    if (it + 1 != json_array.end()) {
-      output += delimit;
-    }
-  }
-  return output;
-}
-
 struct geo_location {
   double latitude;
   double longitude;
@@ -63,7 +51,8 @@ pair<bool, struct geo_location> get_location(string address) {
 string to_lower_case(string input) {
   locale loc;
   string output = "";
-  for (string::size_type i = 0; i < input.length(); ++i)
-    output += tolower(input[i],loc);
+  for (string::size_type i = 0; i < input.length(); ++i) {
+    output += tolower(input[i], loc);
+  }
   return output;
 }
