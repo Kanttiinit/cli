@@ -9,28 +9,30 @@
 #include "time_utils.cpp"
 #include "settings.hpp"
 
+using namespace std;
+
 cxxopts::Options options("Kanttiinit CLI", "Kanttiinit.fi command-line interface.");
 
-void show_menus(std::string query, cxxopts::ParseResult args) {
-  std::string lang = Settings::get("lang", "fi");
+void show_menus(string query, cxxopts::ParseResult args) {
+  string lang = Settings::get("lang", "fi");
   auto restaurants = get("restaurants?" + query + "&lang=" + lang);
-  std::tm date = TimeUtils::parse_day(args["day"].as<std::string>());
-  std::string day = TimeUtils::format(date, "%Y-%m-%d", 11);
-  std::string filter = args.count("filter") ? to_lower_case(args["filter"].as<std::string>()) : "";
+  tm date = TimeUtils::parse_day(args["day"].as<string>());
+  string day = TimeUtils::format(date, "%Y-%m-%d", 11);
+  string filter = args.count("filter") ? to_lower_case(args["filter"].as<string>()) : "";
   int n_restaurants = args.count("number") ? args["number"].as<int>() : -1;
 
   // form string of restaurant IDs and fetch menus for them
-  std::string restaurant_ids = "";
+  string restaurant_ids = "";
   for (auto& restaurant : restaurants) {
     int id = restaurant["id"];
-    restaurant_ids += std::to_string(id) + ",";
+    restaurant_ids += to_string(id) + ",";
   }
   auto menus = get("menus?restaurants=" + restaurant_ids + "&days=" + day + "&lang=" + lang);
   
   // sort restaurants if restaurants are queried by location
   // (in that case they are already sorted by distance in the HTTP response)
-  if (query.find("location") == std::string::npos) {
-    std::sort(restaurants.begin(), restaurants.end(), [](json a, json b) {
+  if (query.find("location") == string::npos) {
+    sort(restaurants.begin(), restaurants.end(), [](json a, json b) {
       return a["name"] < b["name"];
     });
   }
@@ -43,7 +45,7 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
     auto opening_hours = restaurant["openingHours"][TimeUtils::get_weekday(date)];
     bool opened = false;
     if (opening_hours.is_string()) {
-      std::string h = opening_hours;
+      string h = opening_hours;
       opened = TimeUtils::is_open(h);
     }
 
@@ -52,11 +54,11 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
     }
 
     int id = restaurant["id"];
-    auto days = menus[std::to_string(id)];
+    auto days = menus[to_string(id)];
     auto courses = days[day];
-    std::string name = restaurant["name"];
-    std::string address = restaurant["address"];
-    std::string url = restaurant["url"];
+    string name = restaurant["name"];
+    string address = restaurant["address"];
+    string url = restaurant["url"];
     Print::bold(name + " ");
     
     if (opening_hours.is_string()) {
@@ -72,7 +74,7 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
 
     if (restaurant["distance"].is_number()) {
       int distance = restaurant["distance"];
-      Print::dimmed(std::to_string(distance) + " meters away\n");
+      Print::dimmed(to_string(distance) + " meters away\n");
     }
 
     if (args.count("address")) {
@@ -84,18 +86,18 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
     }
 
     for (auto& course : courses) {
-      std::string title = course["title"];
+      string title = course["title"];
 
       // skip this course if a filter keyword is used, and it isn't present in the course title
       if (args.count("filter")) {
-        if (to_lower_case(title).find(filter) == std::string::npos) {
+        if (to_lower_case(title).find(filter) == string::npos) {
           continue;
         }
       }
       
       json properties = course["properties"];
-      std::string prop_string = join_json_array(properties, ", ");
-      std::cout << "◦ " << title << " " << termcolor::dark << prop_string << termcolor::reset << "\n";
+      string prop_string = join_json_array(properties, ", ");
+      cout << "◦ " << title << " " << termcolor::dark << prop_string << termcolor::reset << "\n";
     }
     if (courses.begin() == courses.end()) {
       Print::basic("No menu.\n");
@@ -108,51 +110,70 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
       break;
     }
   }
+
+  if (restaurant_counter == 0) {
+    Print::red("No restaurants matched your query.\n");
+  }
 }
 
 void process_args(cxxopts::ParseResult args) {
   if (args.count("set-lang")) {
-    auto lang = args["set-lang"].as<std::string>();
+    auto lang = args["set-lang"].as<string>();
     if (lang == "fi" || lang == "en") {
       Settings::set("lang", lang);
     }
   }
 
   if (args.count("help")) {
-    Print::basic(options.help());
+    Print::basic(options.help() +
+      "\nGet all restaurants in a specific area:\n"
+      "kanttiinit -q otaniemi\n\n"
+      "Get restaurants by restaurant name:\n"
+      "kanttiinit -q unicafe\n\n"
+      "Get restaurants close to a location:\n"
+      "kanttiinit -g Otakaari 8\n\n"
+      "Only list courses that match a certain keyword:\n"
+      "kanttiinit -q töölö -f salad\n\n"
+      "See menus for tomorrow:\n"
+      "kanttiinit -q alvari -d 1\n"
+    );
   } else if (args.count("version")) {
-    Print::basic("You are running version 1.0.0\n");
-  } else if (args.count("query") && args["query"].as<std::string>().length() > 0) {
-    show_menus("query=" + args["query"].as<std::string>(), args);
+    Print::basic("1.0.0\n");
+  } else if (args.count("query") && args["query"].as<string>().length() > 0) {
+    show_menus("query=" + args["query"].as<string>(), args);
   } else if (args.count("geo")) {
-    auto location_query = args["geo"].as<std::string>();
+    auto location_query = args["geo"].as<string>();
     auto location = get_location(location_query);
     if (location.first) {
-      show_menus("location=" + std::to_string(location.second.latitude) + "," + std::to_string(location.second.longitude), args);
+      show_menus("location=" + to_string(location.second.latitude) + "," + to_string(location.second.longitude), args);
     } else {
       Print::red("Could not resolve location: " + location_query + "\n");
     }
+  } else {
+    Print::basic("Use either the -q or -g option to query restaurants. Display help with --help.\n");
   }
 }
 
 int main(int argc, char *argv[]) {
   options.add_options()
-    ("q,query", "Search restaurants by restaurant or area name.", cxxopts::value<std::string>())
-    ("g,geo", "Search restaurants by location.", cxxopts::value<std::string>())
-    ("d,day", "Specify day.", cxxopts::value<std::string>()->default_value("0"))
-    ("f,filter", "Filter courses by keyword.", cxxopts::value<std::string>())
+    ("q,query", "Search restaurants by restaurant or area name.", cxxopts::value<string>())
+    ("g,geo", "Search restaurants by location.", cxxopts::value<string>())
+    ("d,day", "Specify day.", cxxopts::value<string>()->default_value("0"))
+    ("f,filter", "Filter courses by keyword.", cxxopts::value<string>())
     ("n,number", "Show only n restaurants.", cxxopts::value<int>())
     ("v,version", "Display version.")
     ("a,address", "Show restaurant address.")
     ("u,url", "Show restaurant URL.")
     ("h,hide-closed", "Hide closed restaurants.")
-    ("set-lang", "Save the preferred language (fi or en).", cxxopts::value<std::string>())
+    ("set-lang", "Save the preferred language (fi or en).", cxxopts::value<string>())
     ("help", "Display help.");
 
   try {
     auto args = options.parse(argc, argv);
     process_args(args);
   } catch (cxxopts::argument_incorrect_type e) {
-    Print::red(e.what());
+    Print::red(string(e.what()) + "\n");
+  } catch (cxxopts::option_not_exists_exception e) {
+    Print::red("Unknown option provided.\n");
   }
 }
