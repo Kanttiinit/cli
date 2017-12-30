@@ -21,12 +21,12 @@ std::string exec(std::string cmd) {
 }
 
 json get_json(std::string url) {
-  auto raw_json = exec("curl -sS " + url);
+  auto raw_json = exec("curl -s --header 'User-Agent: Kanttiinit CLI' '" + url + "'");
   return json::parse(raw_json);
 }
 
 json get(std::string endpoint) {
-  auto raw_json = exec("curl -sS https://kitchen.kanttiinit.fi/" + endpoint);
+  auto raw_json = exec("curl -sS 'https://kitchen.kanttiinit.fi/" + endpoint + "'");
   return json::parse(raw_json);
 }
 
@@ -53,7 +53,7 @@ std::pair<bool, struct geo_location> get_location(std::string address) {
   if (results.size()) {
     auto location = results[0]["geometry"]["location"];
     double lat = location["lat"];
-    double lon = location["lon"];
+    double lon = location["lng"];
     return std::make_pair(true, geo_location { lat, lon });
   }
   return std::make_pair(false, geo_location {});

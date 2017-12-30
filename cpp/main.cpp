@@ -7,11 +7,13 @@
 #include "print.cpp"
 #include "utils.cpp"
 #include "time_utils.cpp"
+#include "settings.hpp"
 
 cxxopts::Options options("Kanttiinit CLI", "Kanttiinit.fi command-line interface.");
 
 void show_menus(std::string query, cxxopts::ParseResult args) {
-  auto restaurants = get("restaurants?" + query);
+  std::string lang = Settings::get("lang", "fi");
+  auto restaurants = get("restaurants?" + query + "&lang=" + lang);
   std::tm date = TimeUtils::parse_day(args["day"].as<std::string>());
   std::string day = TimeUtils::format(date, "%Y-%m-%d", 11);
   std::string filter = args.count("filter") ? to_lower_case(args["filter"].as<std::string>()) : "";
@@ -23,7 +25,7 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
     int id = restaurant["id"];
     restaurant_ids += std::to_string(id) + ",";
   }
-  auto menus = get("menus?restaurants=" + restaurant_ids + "days=" + day);
+  auto menus = get("menus?restaurants=" + restaurant_ids + "&days=" + day + "&lang=" + lang);
   
   // sort restaurants if restaurants are queried by location
   // (in that case they are already sorted by distance in the HTTP response)
@@ -68,8 +70,8 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
     }
     Print::basic("\n");
 
-    if (restaurant["distance"].is_number_float()) {
-      float distance = restaurant["distance"];
+    if (restaurant["distance"].is_number()) {
+      int distance = restaurant["distance"];
       Print::dimmed(std::to_string(distance) + " meters away\n");
     }
 
@@ -109,6 +111,13 @@ void show_menus(std::string query, cxxopts::ParseResult args) {
 }
 
 void process_args(cxxopts::ParseResult args) {
+  if (args.count("set-lang")) {
+    auto lang = args["set-lang"].as<std::string>();
+    if (lang == "fi" || lang == "en") {
+      Settings::set("lang", lang);
+    }
+  }
+
   if (args.count("help")) {
     Print::basic(options.help());
   } else if (args.count("version")) {
@@ -137,6 +146,7 @@ int main(int argc, char *argv[]) {
     ("a,address", "Show restaurant address.")
     ("u,url", "Show restaurant URL.")
     ("h,hide-closed", "Hide closed restaurants.")
+    ("set-lang", "Save the preferred language (fi or en).", cxxopts::value<std::string>())
     ("help", "Display help.");
 
   try {

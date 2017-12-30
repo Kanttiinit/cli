@@ -35,6 +35,11 @@
     "__string": "cpp",
     "bitset": "cpp",
     "sstream": "cpp",
-    "chrono": "cpp"
+    "chrono": "cpp",
+    "__functional_base": "cpp",
+    "istream": "cpp",
+    "utility": "cpp",
+    "algorithm": "cpp",
+    "functional": "cpp"
   }
 }
