@@ -17,6 +17,9 @@ namespace Settings {
 
 void Settings::set(std::string key, std::string value) {
   Settings::list all = Settings::get_all();
+  if (all.find(key) != all.end()) {
+    all.erase(key);
+  }
   all.emplace(key, value);
   Settings::set_all(all);
 }
