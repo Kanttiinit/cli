@@ -34,6 +34,12 @@ namespace TimeUtils {
     return string(output);
   }
 
+  string format_now(string format, size_t size) {
+    auto t = time(0);
+    auto tm = localtime(&t);
+    return TimeUtils::format(*tm, format, size);
+  }
+
   int get_weekday(tm tm) {
     time_t t = mktime(&tm);
     char today[2];

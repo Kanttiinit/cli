@@ -18,6 +18,7 @@ void show_menus(string query, cxxopts::ParseResult args) {
   auto restaurants = get("restaurants?" + query + "&lang=" + lang);
   tm date = TimeUtils::parse_day(args["day"].as<string>());
   string day = TimeUtils::format(date, "%Y-%m-%d", 11);
+  bool is_today = day == TimeUtils::format_now("%Y-%m-%d", 11);
   string filter = args.count("filter") ? to_lower_case(args["filter"].as<string>()) : "";
   int n_restaurants = args.count("number") ? args["number"].as<int>() : -1;
 
@@ -61,7 +62,9 @@ void show_menus(string query, cxxopts::ParseResult args) {
     Print::bold(name + " ");
     
     if (opening_hours.is_string()) {
-      if (opened) {
+      if (!is_today) {
+        Print::basic(opening_hours);
+      } else if (opened) {
         Print::green(opening_hours);
       } else {
         Print::dimmed(opening_hours);
