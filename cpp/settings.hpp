@@ -1,3 +1,6 @@
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
 #include <string>
 #include <map>
 #include <iostream>
@@ -62,3 +65,5 @@ void Settings::set_all(Settings::list settings) {
   }
   file.close();
 }
+
+#endif

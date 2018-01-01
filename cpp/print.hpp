@@ -1,3 +1,6 @@
+#ifndef PRINT_H
+#define PRINT_H
+
 #include "lib/termcolor.hpp"
 
 using namespace std;
@@ -23,3 +26,5 @@ namespace Print {
     cout << message;
   }
 }
+
+#endif

@@ -1,4 +1,4 @@
-dev: main.cpp utils.cpp time_utils.cpp print.cpp
+dev: main.cpp
 	g++ -std=c++11 -o kanttiinit main.cpp
 
 build: main.cpp

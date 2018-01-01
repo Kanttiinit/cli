@@ -1,16 +1,11 @@
+#ifndef TIME_H
+#define TIME_H
+
 #include <string>
 
-using namespace std;
+#include "utils.hpp"
 
-// from https://stackoverflow.com/a/4654718/1810160
-bool is_number(const string& s) {
-  string::const_iterator it = s.begin();
-  if (*it == '-') {
-    it++;
-  }
-  while (it != s.end() && isdigit(*it)) ++it;
-  return !s.empty() && it == s.end();
-}
+using namespace std;
 
 namespace TimeUtils {
   tm parse_day(string day) {
@@ -87,3 +82,5 @@ namespace TimeUtils {
     return to_string(hours) + " hours " + to_string(minutes) + " minutes";
   }
 }
+
+#endif

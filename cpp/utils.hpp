@@ -1,3 +1,6 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include <cstdio>
 #include <iostream>
 #include <memory>
@@ -56,3 +59,15 @@ string to_lower_case(string input) {
   }
   return output;
 }
+
+// from https://stackoverflow.com/a/4654718/1810160
+bool is_number(const string& s) {
+  string::const_iterator it = s.begin();
+  if (*it == '-') {
+    it++;
+  }
+  while (it != s.end() && isdigit(*it)) ++it;
+  return !s.empty() && it == s.end();
+}
+
+#endif

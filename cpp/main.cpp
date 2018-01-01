@@ -1,12 +1,9 @@
-#include <iostream>
-#include <ctime>
-
 #include "lib/termcolor.hpp"
 #include "lib/cxxopts.hpp"
 
-#include "print.cpp"
-#include "utils.cpp"
-#include "time_utils.cpp"
+#include "print.hpp"
+#include "utils.hpp"
+#include "time_utils.hpp"
 #include "settings.hpp"
 
 using namespace std;
