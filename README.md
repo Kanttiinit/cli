@@ -1,40 +1,49 @@
 # Kanttiinit CLI
 
 ## Install
-`npm i -g kanttiinit`
+To do...
 
-Note! Requires at least Node 7.6.
+Requires curl.
 
 ## Usage
 ```
 $ kanttiinit --help
+Kanttiinit.fi command-line interface.
+Usage:
+  Kanttiinit CLI [OPTION...]
 
-  Usage: kanttiinit [options] [command]
+  -q, --query arg     Search restaurants by restaurant or area name.
+  -g, --geo arg       Search restaurants by location.
+  -d, --day arg       Specify day. (default: 0)
+  -f, --filter arg    Filter courses by keyword.
+  -n, --number arg    Show only n restaurants.
+  -v, --version       Display version.
+  -a, --address       Show restaurant address.
+  -u, --url           Show restaurant URL.
+  -h, --hide-closed   Hide closed restaurants.
+      --set-lang arg  Save the preferred language (fi or en).
+      --help          Display help.
 
+Get all restaurants in a specific area:
+kanttiinit -q otaniemi
 
-  Options:
+Get restaurants by restaurant name:
+kanttiinit -q unicafe
 
-    -V, --version           output the version number
-    -d, --day <day>         specify day
-    -a, --address           show restaurant address
-    -u, --url               show restaurant URL
-    -h, --hide-closed       hide closed restaurants
-    -f, --filter <keyword>  filter courses by keyword
-    -n, --number <number>   show only n restaurants
-    -h, --help              output usage information
+Get restaurants close to a location:
+kanttiinit -g Otakaari 8
 
+Only list courses that match a certain keyword:
+kanttiinit -q töölö -f salad
 
-  Commands:
-
-    *                    Search restaurants by restaurant or area name.
-    geo <address>        Query restaurants by your address.
-    set-lang <language>  Set and persist the preferred language (accepted values are fi and en).
+See menus for tomorrow:
+kanttiinit -q alvari -d 1
 ```
 
 ## Examples
-* Get all restaurants in an area: `kanttiinit otaniemi`
-* Get all restaurants whose title matches the query: `kanttiinit aalto`
-* Get nearest restaurants to an address: `kanttiinit geo otakaari 1`
-* Hide closed restaurants: `kanttiinit -h keskusta`
-* Show tomorrows menus: `kanttiinit -d 1 töölö`
-* Only show courses which contain the word pizza: `kanttiinit -f pizza arabia`
+* Get all restaurants in an area: `kanttiinit -q otaniemi`
+* Get all restaurants whose title matches the query: `kanttiinit -q aalto`
+* Get nearest restaurants to an address: `kanttiinit -g otakaari 1`
+* Hide closed restaurants: `kanttiinit -h -q keskusta`
+* Show tomorrows menus: `kanttiinit -d 1 -q töölö`
+* Only show courses which contain the word pizza: `kanttiinit -f pizza -q arabia`
