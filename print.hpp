@@ -6,6 +6,25 @@
 using namespace std;
 
 namespace Print {
+  string current_progress = "";
+
+  void progress(string message) {
+    cout << message;
+    int length_diff = current_progress.length() - message.length();
+    for (int i = 0; i < length_diff; i++) {
+      cout << " ";
+    }
+    cout << "\r";
+    current_progress = message;
+  }
+
+  void erase_progress() {
+    cout << "\r";
+    for (size_t i = 0; i < current_progress.length(); i++) {
+      cout << " ";
+    }
+  }
+
   void dimmed(string message) {
     cout << termcolor::dark << message << termcolor::reset;
   }

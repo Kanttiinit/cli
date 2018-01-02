@@ -12,6 +12,7 @@ cxxopts::Options options("Kanttiinit CLI", "Kanttiinit.fi command-line interface
 
 void show_menus(string query, cxxopts::ParseResult args) {
   string lang = Settings::get("lang", "fi");
+  Print::progress("Fetching restaurants...");
   auto restaurants = get("restaurants?" + query + "&lang=" + lang);
   tm date = TimeUtils::parse_day(args["day"].as<string>());
   string day = TimeUtils::format(date, "%Y-%m-%d", 11);
@@ -24,7 +25,9 @@ void show_menus(string query, cxxopts::ParseResult args) {
     int id = restaurant["id"];
     return list + to_string(id) + ",";
   });
+  Print::progress("Fetching menus...");
   auto menus = get("menus?restaurants=" + restaurant_ids + "&days=" + day + "&lang=" + lang);
+  Print::erase_progress();
   
   // sort restaurants if restaurants are queried by location
   // (in that case they are already sorted by distance in the HTTP response)
@@ -149,6 +152,7 @@ void process_args(cxxopts::ParseResult args) {
   } else if (args.count("query") && args["query"].as<string>().length() > 0) {
     show_menus("query=" + args["query"].as<string>(), args);
   } else if (args.count("geo")) {
+    Print::progress("Resolving location...");
     auto location_query = args["geo"].as<string>();
     auto location = get_location(location_query);
     if (location.first) {
