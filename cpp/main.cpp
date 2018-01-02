@@ -63,6 +63,7 @@ void show_menus(string query, cxxopts::ParseResult args) {
         Print::basic(opening_hours);
       } else if (opened) {
         Print::green(opening_hours);
+        Print::dimmed(" closes in " + TimeUtils::time_until(opening_hours));
       } else {
         Print::dimmed(opening_hours);
       }

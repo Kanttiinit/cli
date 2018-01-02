@@ -74,12 +74,18 @@ namespace TimeUtils {
     return is_before(open, now) && is_before(now, close);
   }
 
-  string time_until(tm t) {
-    double seconds = difftime(time(0), mktime(&t));
-    int hours = seconds / 60 / 60;
-    seconds -= hours * 60 * 60;
-    int minutes = seconds / 60;
-    return to_string(hours) + " hours " + to_string(minutes) + " minutes";
+  string time_until(string opening_hours) {
+    string close = opening_hours.substr(opening_hours.find(" - ") + 3, opening_hours.length());
+    time_of_day tod = TimeUtils::parse_time_of_day(close);
+    auto t = time(0);
+    auto tm = localtime(&t);
+    int hours = tod.hours - tm->tm_hour;
+    int minutes = 60 - (tm->tm_min - tod.minutes);
+    string out = to_string(minutes) + "min";
+    if (hours > 0) {
+      out = to_string(hours) + "h " + out;
+    }
+    return out;
   }
 }
 
